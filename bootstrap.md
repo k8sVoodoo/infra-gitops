@@ -44,3 +44,23 @@ flux bootstrap github \
   --personal
 ```
 Paste your PAT when prompted.
+
+## Flux Commands
+
+Observe all your resources:
+```bash
+flux get all -A
+
+# or continuously watch
+
+flux get all -A --watch
+```
+
+Independent Resources:
+```bash
+flux get sources all
+
+flux get kustomizations # shorthand ks
+
+flux get helmreleases # shorthand hr
+```

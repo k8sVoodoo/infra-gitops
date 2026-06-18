@@ -1,0 +1,22 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: arc-runner-set
+  namespace: runners
+spec:
+  interval: 10m
+  chart:
+    spec:
+      chart: gha-runner-scale-set
+      sourceRef:
+        kind: HelmRepository
+        name: actions-runner-controller-charts
+        namespace: arc-systems
+  values:
+    githubConfigUrl: "https://github.com/k8sVoodoo/infra-gitops"
+    githubConfigSecret: controller-manager
+
+    minRunners: 0
+    maxRunners: 2
+
+    runnerScaleSetName: "arc-runner-set"

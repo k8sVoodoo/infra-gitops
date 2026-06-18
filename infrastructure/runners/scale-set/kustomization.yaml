@@ -3,6 +3,4 @@ kind: Kustomization
 
 resources:
   - namespace.yaml
-  - helmrepositories.yaml
-  - arc-controller.yaml
   - arc-runner-scale-set.yaml
