@@ -20,11 +20,21 @@ kubectl create secret generic controller-manager \
 | Windows          | Winget                  | `winget install FluxCD.Flux`                        |
 | Windows          | Scoop                   | `scoop install flux`                                |
 
+Then deploy pods and CRDs
+```bash
+flux install
+
+# verify install
+kubectl get crds | grep toolkit
+kubectl get pods -n flux-system
+```
 
 ## Bootstrap Flux
 ```bash
 export GITHUB_USER="YOUR_GITHUB_USER"
 export GITHUB_REPO="infra-gitops"
+
+flux check --pre
 
 flux bootstrap github \
   --owner=$GITHUB_USER \
@@ -33,3 +43,4 @@ flux bootstrap github \
   --path=clusters/docker-desktop \
   --personal
 ```
+Paste your PAT when prompted.
