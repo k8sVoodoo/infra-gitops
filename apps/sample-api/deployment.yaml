@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample-api
+  namespace: sample-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sample-api
+  template:
+    metadata:
+      labels:
+        app: sample-api
+    spec:
+      containers:
+        - name: sample-api
+          image: ghcr.io/YOUR_GITHUB_USER/sample-api:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: OTEL_SERVICE_NAME
+              value: sample-api
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://otel-collector.observability.svc.cluster.local:4317

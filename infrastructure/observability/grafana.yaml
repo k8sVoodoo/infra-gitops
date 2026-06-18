@@ -1,0 +1,37 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: grafana
+  namespace: observability
+spec:
+  interval: 10m
+  chart:
+    spec:
+      chart: grafana
+      version: ">=8.0.0"
+      sourceRef:
+        kind: HelmRepository
+        name: grafana
+        namespace: observability
+  values:
+    adminUser: admin
+    adminPassword: admin
+    service:
+      type: NodePort
+      nodePort: 30300
+    datasources:
+      datasources.yaml:
+        apiVersion: 1
+        datasources:
+          - name: Loki
+            type: loki
+            access: proxy
+            url: http://loki-gateway.observability.svc.cluster.local
+          - name: Tempo
+            type: tempo
+            access: proxy
+            url: http://tempo.observability.svc.cluster.local:3100
+          - name: Mimir
+            type: prometheus
+            access: proxy
+            url: http://mimir-nginx.observability.svc.cluster.local/prometheus

@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample-web
+  namespace: sample-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sample-web
+  template:
+    metadata:
+      labels:
+        app: sample-web
+    spec:
+      containers:
+        - name: sample-web
+          image: ghcr.io/YOUR_GITHUB_USER/sample-web:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
