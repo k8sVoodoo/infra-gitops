@@ -11,7 +11,7 @@ spec:
   timeout: 5m
   sourceRef:
     kind: GitRepository
-    name: flux-system
+    name: infra-gitops
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -28,4 +28,4 @@ spec:
     - name: arc-controller
   sourceRef:
     kind: GitRepository
-    name: flux-system
+    name: infra-gitops
