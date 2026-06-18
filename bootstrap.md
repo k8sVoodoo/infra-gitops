@@ -64,3 +64,9 @@ flux get kustomizations # shorthand ks
 
 flux get helmreleases # shorthand hr
 ```
+
+Reconcile commands:
+```bash
+flux reconcile kustomization arc-controller --with-source -n flux-system
+flux reconcile kustomization arc-runners --with-source -n flux-system
+```
