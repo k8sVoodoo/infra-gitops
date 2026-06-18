@@ -6,6 +6,6 @@ resources:
   - helmrepositories.yaml
   - loki.yaml
   - tempo.yaml
-  - mimir.yaml
+  # - mimir.yaml
   - grafana.yaml
   - otel-collector.yaml

@@ -1,3 +1,4 @@
+# infrastructure/observability/otel-collector.yaml
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -8,13 +9,15 @@ spec:
   chart:
     spec:
       chart: opentelemetry-collector
-      version: ">=0.100.0"
+      version: "0.158.2"
       sourceRef:
         kind: HelmRepository
         name: open-telemetry
         namespace: observability
   values:
     mode: deployment
+    image:
+      repository: otel/opentelemetry-collector-contrib
     config:
       receivers:
         otlp:
@@ -23,20 +26,14 @@ spec:
               endpoint: 0.0.0.0:4317
             http:
               endpoint: 0.0.0.0:4318
-
       processors:
         batch: {}
-
       exporters:
+        debug: {}
         otlp/tempo:
           endpoint: tempo.observability.svc.cluster.local:4317
           tls:
             insecure: true
-        prometheusremotewrite/mimir:
-          endpoint: http://mimir-nginx.observability.svc.cluster.local/api/v1/push
-        loki:
-          endpoint: http://loki-gateway.observability.svc.cluster.local/loki/api/v1/push
-
       service:
         pipelines:
           traces:
@@ -46,8 +43,8 @@ spec:
           metrics:
             receivers: [otlp]
             processors: [batch]
-            exporters: [prometheusremotewrite/mimir]
+            exporters: [debug]
           logs:
             receivers: [otlp]
             processors: [batch]
-            exporters: [loki]
+            exporters: [debug]

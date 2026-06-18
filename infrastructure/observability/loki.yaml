@@ -1,3 +1,4 @@
+# infrastructure/observability/loki.yaml
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -8,7 +9,7 @@ spec:
   chart:
     spec:
       chart: loki
-      version: ">=6.0.0"
+      version: "7.0.0"
       sourceRef:
         kind: HelmRepository
         name: grafana
@@ -17,6 +18,7 @@ spec:
     deploymentMode: SingleBinary
     loki:
       auth_enabled: false
+      useTestSchema: true
       commonConfig:
         replication_factor: 1
       storage:
