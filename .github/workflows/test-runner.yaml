@@ -8,6 +8,8 @@ jobs:
     runs-on: arc-runner-set
 
     steps:
+      - run: echo "ARC runner is working"
       - run: hostname
-      - run: kubectl version --client
-      - run: echo "ARC is working"
+      - run: uname -a
+      - run: whoami
+      - run: pwd
