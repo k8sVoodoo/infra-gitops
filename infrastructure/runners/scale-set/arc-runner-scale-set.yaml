@@ -1,3 +1,4 @@
+# infrastructure/runners/scale-set/arc-runner-scale-set.yaml
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -14,9 +15,12 @@ spec:
         namespace: arc-systems
   values:
     githubConfigUrl: "https://github.com/k8sVoodoo/infra-gitops"
-    githubConfigSecret: controller-manager
+    githubConfigSecret: github-runner-secret
 
     minRunners: 0
     maxRunners: 2
 
     runnerScaleSetName: "arc-runner-set"
+
+    containerMode:
+      type: dind
