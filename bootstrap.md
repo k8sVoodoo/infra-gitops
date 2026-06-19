@@ -99,3 +99,11 @@ kubectl create secret generic github-runner-secret \
 
 ## Sample Grafana Dashboard
 ![Grafana Dashboard](images/grafanaDashboard.png)
+
+## Port Forwarding for Services
+Run each one in a separate terminal window
+```bash
+kubectl port-forward -n observability svc/grafana 3000:80
+kubectl port-forward -n sample-api svc/sample-api 8080:8080
+kubectl port-forward -n sample-web svc/sample-web 8081:80
+```
