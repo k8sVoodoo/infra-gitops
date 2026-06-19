@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: sample-web
-          image: sample-web:local
+          image: ghcr.io/k8svoodoo/sample-web:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80
@@ -28,3 +28,5 @@ spec:
             limits:
               cpu: 150m
               memory: 128Mi
+      imagePullSecrets:
+        - name: ghcr-pull-secret

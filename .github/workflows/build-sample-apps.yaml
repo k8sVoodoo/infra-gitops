@@ -1,0 +1,66 @@
+name: Build Sample Apps
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "apps/sample-api/**"
+      - "apps/sample-web/**"
+      - ".github/workflows/build-sample-apps.yaml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_OWNER: k8svoodoo
+
+jobs:
+  build-sample-api:
+    runs-on: arc-runner-set
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push sample-api
+        uses: docker/build-push-action@v6
+        with:
+          context: ./apps/sample-api
+          push: true
+          tags: |
+            ghcr.io/${{ env.IMAGE_OWNER }}/sample-api:latest
+            ghcr.io/${{ env.IMAGE_OWNER }}/sample-api:${{ github.sha }}
+
+  build-sample-web:
+    runs-on: arc-runner-set
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push sample-web
+        uses: docker/build-push-action@v6
+        with:
+          context: ./apps/sample-web
+          push: true
+          tags: |
+            ghcr.io/${{ env.IMAGE_OWNER }}/sample-web:latest
+            ghcr.io/${{ env.IMAGE_OWNER }}/sample-web:${{ github.sha }}
