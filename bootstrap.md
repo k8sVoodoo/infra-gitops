@@ -96,3 +96,6 @@ kubectl create secret generic github-runner-secret \
 -n runners \
 --from-literal=github_token=YOUR_PAT
 ```
+
+## Sample Grafana Dashboard
+![Grafana Dashboard](images/grafanaDashboard.png)
