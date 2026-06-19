@@ -15,64 +15,37 @@ permissions:
   packages: write
 
 env:
-  REGISTRY: ghcr.io
   IMAGE_OWNER: k8svoodoo
 
 jobs:
   build-sample-api:
     runs-on: arc-runner-set
-    container:
-      image: gcr.io/kaniko-project/executor:debug
     steps:
       - uses: actions/checkout@v4
 
-      - name: Configure GHCR auth
-        run: |
-          mkdir -p /kaniko/.docker
-          cat > /kaniko/.docker/config.json <<EOF
-          {
-            "auths": {
-              "ghcr.io": {
-                "username": "${{ github.actor }}",
-                "password": "${{ secrets.GITHUB_TOKEN }}"
-              }
-            }
-          }
-          EOF
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
-      - name: Build and push sample-api
+      - name: Build sample-api
+        run: docker build -t ghcr.io/${{ env.IMAGE_OWNER }}/sample-api:latest -t ghcr.io/${{ env.IMAGE_OWNER }}/sample-api:${{ github.sha }} ./apps/sample-api
+
+      - name: Push sample-api
         run: |
-          /kaniko/executor \
-            --context "${{ github.workspace }}/apps/sample-api" \
-            --dockerfile "${{ github.workspace }}/apps/sample-api/Dockerfile" \
-            --destination "ghcr.io/${{ env.IMAGE_OWNER }}/sample-api:latest" \
-            --destination "ghcr.io/${{ env.IMAGE_OWNER }}/sample-api:${{ github.sha }}"
+          docker push ghcr.io/${{ env.IMAGE_OWNER }}/sample-api:latest
+          docker push ghcr.io/${{ env.IMAGE_OWNER }}/sample-api:${{ github.sha }}
 
   build-sample-web:
     runs-on: arc-runner-set
-    container:
-      image: gcr.io/kaniko-project/executor:debug
     steps:
       - uses: actions/checkout@v4
 
-      - name: Configure GHCR auth
-        run: |
-          mkdir -p /kaniko/.docker
-          cat > /kaniko/.docker/config.json <<EOF
-          {
-            "auths": {
-              "ghcr.io": {
-                "username": "${{ github.actor }}",
-                "password": "${{ secrets.GITHUB_TOKEN }}"
-              }
-            }
-          }
-          EOF
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
-      - name: Build and push sample-web
+      - name: Build sample-web
+        run: docker build -t ghcr.io/${{ env.IMAGE_OWNER }}/sample-web:latest -t ghcr.io/${{ env.IMAGE_OWNER }}/sample-web:${{ github.sha }} ./apps/sample-web
+
+      - name: Push sample-web
         run: |
-          /kaniko/executor \
-            --context "${{ github.workspace }}/apps/sample-web" \
-            --dockerfile "${{ github.workspace }}/apps/sample-web/Dockerfile" \
-            --destination "ghcr.io/${{ env.IMAGE_OWNER }}/sample-web:latest" \
-            --destination "ghcr.io/${{ env.IMAGE_OWNER }}/sample-web:${{ github.sha }}"
+          docker push ghcr.io/${{ env.IMAGE_OWNER }}/sample-web:latest
+          docker push ghcr.io/${{ env.IMAGE_OWNER }}/sample-web:${{ github.sha }}
