@@ -3,19 +3,28 @@ kind: Deployment
 metadata:
   name: sample-web
   namespace: sample-web
+  labels:
+    app.kubernetes.io/name: sample-web
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
-      app: sample-web
+      app.kubernetes.io/name: sample-web
   template:
     metadata:
       labels:
-        app: sample-web
+        app.kubernetes.io/name: sample-web
     spec:
       containers:
         - name: sample-web
-          image: ghcr.io/YOUR_GITHUB_USER/sample-web:latest
-          imagePullPolicy: Always
+          image: sample-web:local
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80
+          resources:
+            requests:
+              cpu: 25m
+              memory: 32Mi
+            limits:
+              cpu: 150m
+              memory: 128Mi

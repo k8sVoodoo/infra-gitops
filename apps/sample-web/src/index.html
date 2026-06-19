@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sample Web</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background: #111827;
+      color: #f9fafb;
+    }
+    .card {
+      background: #1f2937;
+      border-radius: 12px;
+      padding: 24px;
+      max-width: 700px;
+    }
+    button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-right: 8px;
+    }
+    pre {
+      background: #030712;
+      padding: 16px;
+      border-radius: 8px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Sample Web</h1>
+    <p>This page is served from Kubernetes and calls the Sample API.</p>
+
+    <button onclick="callApi()">Call API</button>
+    <button onclick="callError()">Generate API Error</button>
+
+    <h3>Response</h3>
+    <pre id="output">Click a button...</pre>
+  </div>
+
+  <script>
+    async function callApi() {
+      const res = await fetch("http://localhost:30081/api/message");
+      const data = await res.json();
+      document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function callError() {
+      const res = await fetch("http://localhost:30081/api/error");
+      const data = await res.json();
+      document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+    }
+  </script>
+</body>
+</html>

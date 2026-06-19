@@ -4,9 +4,11 @@ metadata:
   name: sample-api
   namespace: sample-api
 spec:
+  type: NodePort
   selector:
-    app: sample-api
+    app.kubernetes.io/name: sample-api
   ports:
     - name: http
       port: 8080
       targetPort: 8080
+      nodePort: 30081
