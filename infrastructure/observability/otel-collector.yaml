@@ -31,7 +31,7 @@ spec:
       exporters:
         debug: {}
         otlp/tempo:
-          endpoint: tempo.observability.svc.cluster.local:4317
+          endpoint: tempo.observability.svc.cluster.local:14250
           tls:
             insecure: true
       service:
