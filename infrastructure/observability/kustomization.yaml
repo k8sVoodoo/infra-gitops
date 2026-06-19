@@ -9,3 +9,4 @@ resources:
   # - mimir.yaml
   - grafana.yaml
   - otel-collector.yaml
+  - otel-logs.yaml
