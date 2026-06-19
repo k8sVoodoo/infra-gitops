@@ -26,6 +26,8 @@ spec:
               value: sample-api
             - name: VERSION
               value: v1
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://otel-collector.observability.svc.cluster.local:4317
           readinessProbe:
             httpGet:
               path: /healthz

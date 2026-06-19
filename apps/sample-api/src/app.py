@@ -4,10 +4,43 @@ import random
 import socket
 import time
 
-app = Flask(__name__)
+from opentelemetry import trace
+from opentelemetry.instrumentation.flask import FlaskInstrumentor
+from opentelemetry.sdk.resources import Resource
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+
 
 SERVICE_NAME = os.getenv("SERVICE_NAME", "sample-api")
 VERSION = os.getenv("VERSION", "v1")
+OTEL_ENDPOINT = os.getenv(
+    "OTEL_EXPORTER_OTLP_ENDPOINT",
+    "http://otel-collector.observability.svc.cluster.local:4317",
+)
+
+resource = Resource.create(
+    {
+        "service.name": SERVICE_NAME,
+        "service.version": VERSION,
+        "deployment.environment": "homelab",
+    }
+)
+
+provider = TracerProvider(resource=resource)
+processor = BatchSpanProcessor(
+    OTLPSpanExporter(
+        endpoint=OTEL_ENDPOINT,
+        insecure=True,
+    )
+)
+provider.add_span_processor(processor)
+trace.set_tracer_provider(provider)
+
+tracer = trace.get_tracer(__name__)
+
+app = Flask(__name__)
+FlaskInstrumentor().instrument_app(app)
 
 
 @app.before_request
@@ -44,121 +77,81 @@ def healthz():
 
 @app.route("/api/message")
 def message():
-    return jsonify(
-        {
-            "message": "GitOps + Flux + Grafana + Loki is working",
-            "random_number": random.randint(1, 100),
-            "hostname": socket.gethostname(),
-        }
-    )
+    with tracer.start_as_current_span("generate_random_message"):
+        return jsonify(
+            {
+                "message": "GitOps + Flux + Grafana + Loki + Tempo is working",
+                "random_number": random.randint(1, 100),
+                "hostname": socket.gethostname(),
+            }
+        )
 
 
 @app.route("/api/error")
 def random_error():
-    print(
-        {
-            "service": SERVICE_NAME,
-            "level": "error",
-            "message": "This is a fake error for Grafana Loki testing",
-        },
-        flush=True,
-    )
-    return jsonify({"error": "fake test error"}), 500
+    with tracer.start_as_current_span("fake_error"):
+        print(
+            {
+                "service": SERVICE_NAME,
+                "level": "error",
+                "message": "This is a fake error for Grafana Loki testing",
+            },
+            flush=True,
+        )
+        return jsonify({"error": "fake test error"}), 500
 
 
 @app.route("/api/work")
 def work():
-    print({"service": SERVICE_NAME, "step": "work_started"}, flush=True)
+    with tracer.start_as_current_span("api_work_request") as span:
+        span.set_attribute("app.endpoint", "/api/work")
 
-    print({"service": SERVICE_NAME, "step": "auth_started"}, flush=True)
-    time.sleep(0.05)
-    print({"service": SERVICE_NAME, "step": "auth_completed", "duration_ms": 50}, flush=True)
+        with tracer.start_as_current_span("authentication"):
+            time.sleep(0.05)
 
-    print({"service": SERVICE_NAME, "step": "database_lookup_started"}, flush=True)
-    time.sleep(0.10)
-    print(
-        {
-            "service": SERVICE_NAME,
-            "step": "database_lookup_completed",
-            "duration_ms": 100,
-        },
-        flush=True,
-    )
+        with tracer.start_as_current_span("database_lookup"):
+            time.sleep(0.10)
 
-    print({"service": SERVICE_NAME, "step": "external_api_started"}, flush=True)
-    time.sleep(0.20)
-    print(
-        {
-            "service": SERVICE_NAME,
-            "step": "external_api_completed",
-            "duration_ms": 200,
-        },
-        flush=True,
-    )
+        with tracer.start_as_current_span("external_api_call"):
+            time.sleep(0.20)
 
-    print({"service": SERVICE_NAME, "step": "response_formatting_started"}, flush=True)
-    time.sleep(0.03)
-    print(
-        {
-            "service": SERVICE_NAME,
-            "step": "response_formatting_completed",
-            "duration_ms": 30,
-        },
-        flush=True,
-    )
+        with tracer.start_as_current_span("response_formatting"):
+            time.sleep(0.03)
 
-    print({"service": SERVICE_NAME, "step": "work_completed"}, flush=True)
-
-    return jsonify(
-        {
-            "status": "done",
-            "service": SERVICE_NAME,
-            "version": VERSION,
-            "hostname": socket.gethostname(),
-            "steps": {
-                "auth_ms": 50,
-                "database_lookup_ms": 100,
-                "external_api_ms": 200,
-                "response_formatting_ms": 30,
-            },
-            "total_simulated_ms": 380,
-        }
-    )
+        return jsonify(
+            {
+                "status": "done",
+                "service": SERVICE_NAME,
+                "version": VERSION,
+                "hostname": socket.gethostname(),
+                "steps": {
+                    "authentication_ms": 50,
+                    "database_lookup_ms": 100,
+                    "external_api_call_ms": 200,
+                    "response_formatting_ms": 30,
+                },
+                "total_simulated_ms": 380,
+            }
+        )
 
 
 @app.route("/api/slow")
 def slow():
     delay = random.uniform(0.5, 2.0)
 
-    print(
-        {
-            "service": SERVICE_NAME,
-            "level": "warning",
-            "message": "slow request started",
-            "delay_seconds": round(delay, 2),
-        },
-        flush=True,
-    )
+    with tracer.start_as_current_span("slow_request") as span:
+        span.set_attribute("delay_seconds", round(delay, 2))
 
-    time.sleep(delay)
+        with tracer.start_as_current_span("slow_dependency"):
+            time.sleep(delay)
 
-    print(
-        {
-            "service": SERVICE_NAME,
-            "level": "warning",
-            "message": "slow request completed",
-            "delay_seconds": round(delay, 2),
-        },
-        flush=True,
-    )
-
-    return jsonify(
-        {
-            "status": "slow request completed",
-            "delay_seconds": round(delay, 2),
-            "hostname": socket.gethostname(),
-        }
-    )
+        return jsonify(
+            {
+                "status": "slow request completed",
+                "delay_seconds": round(delay, 2),
+                "hostname": socket.gethostname(),
+            }
+        )
 
 
 if __name__ == "__main__":
