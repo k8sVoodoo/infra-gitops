@@ -70,3 +70,29 @@ Reconcile commands:
 flux reconcile kustomization arc-controller --with-source -n flux-system
 flux reconcile kustomization arc-runners --with-source -n flux-system
 ```
+
+## Sample Apps
+
+Manually create Github Registry Cred Secrets for both Sample API and Sample Web
+```bash
+kubectl create secret docker-registry ghcr-pull-secret \
+  --namespace sample-web \
+  --docker-server=ghcr.io \
+  --docker-username=YOUR_USERNAME \
+  --docker-password=YOUR_PAT \
+  --docker-email=YOUR_EMAIL
+
+kubectl create secret docker-registry ghcr-pull-secret \
+  --namespace sample-web \
+  --docker-server=ghcr.io \
+  --docker-username=YOUR_USERNAME \
+  --docker-password=YOUR_PAT \
+  --docker-email=YOUR_EMAIL
+```
+
+Manually create your secret for your runner
+```bash
+kubectl create secret generic github-runner-secret \
+-n runners \
+--from-literal=github_token=YOUR_PAT
+```
