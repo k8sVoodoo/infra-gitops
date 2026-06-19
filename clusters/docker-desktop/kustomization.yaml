@@ -4,5 +4,5 @@ kind: Kustomization
 resources:
   - flux-system
   - infrastructure.yaml
-  # - apps.yaml
+  - apps.yaml
   - runners.yaml
