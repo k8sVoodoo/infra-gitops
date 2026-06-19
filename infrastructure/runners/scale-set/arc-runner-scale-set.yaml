@@ -13,21 +13,21 @@ spec:
         kind: HelmRepository
         name: actions-runner-controller-charts
         namespace: arc-systems
-values:
-  githubConfigUrl: "https://github.com/k8sVoodoo/infra-gitops"
-  githubConfigSecret: github-runner-secret
+  values:
+    githubConfigUrl: "https://github.com/k8sVoodoo/infra-gitops"
+    githubConfigSecret: github-runner-secret
 
-  runnerScaleSetName: arc-runner-set
+    runnerScaleSetName: arc-runner-set
 
-  minRunners: 1
-  maxRunners: 4
+    minRunners: 1
+    maxRunners: 4
 
-  containerMode:
-    type: dind
+    containerMode:
+      type: dind
 
-  template:
-    spec:
-      containers:
-        - name: runner
-          image: ghcr.io/actions/actions-runner:latest
-          command: ["/home/runner/run.sh"]
+    template:
+      spec:
+        containers:
+          - name: runner
+            image: ghcr.io/actions/actions-runner:latest
+            command: ["/home/runner/run.sh"]
