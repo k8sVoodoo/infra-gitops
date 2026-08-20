@@ -107,3 +107,11 @@ kubectl port-forward -n observability svc/grafana 3000:80
 kubectl port-forward -n sample-api svc/sample-api 8080:8080
 kubectl port-forward -n sample-web svc/sample-web 8081:80
 ```
+
+# TROUBLESHOOTING
+
+## Resetting Grafana Password
+To reset the admin password run the following command with your correct namespace and pod for grafana. Replace newpassword with password you want to use.
+```base
+kubectl exec -it <namespace> <grafana-pod> -- grafana-cli admin reset-admin-password newpassword
+```
